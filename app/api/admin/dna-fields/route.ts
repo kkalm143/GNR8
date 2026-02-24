@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const fields = await prisma.dNAInterpretationField.findMany({
     orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
   });
@@ -14,15 +12,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
     const { name, type, min, max, options, displayOrder } = body;
     if (!name || typeof name !== "string") {
-      return NextResponse.json({ error: "Name is required." }, { status: 400 });
+      return apiError("Name is required.", 400);
     }
     const field = await prisma.dNAInterpretationField.create({
       data: {
@@ -37,6 +33,6 @@ export async function POST(request: Request) {
     return NextResponse.json(field);
   } catch (e) {
     console.error("Create DNA field error:", e);
-    return NextResponse.json({ error: "Failed to create field." }, { status: 500 });
+    return apiError("Failed to create field.", 500);
   }
 }

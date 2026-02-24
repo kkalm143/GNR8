@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { Role } from "@prisma/client";
 
@@ -7,18 +7,16 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: programId } = await params;
   const program = await prisma.program.findUnique({ where: { id: programId } });
-  if (!program) return NextResponse.json({ error: "Program not found." }, { status: 404 });
+  if (!program) return apiError("Program not found.", 404);
   try {
     const body = await request.json();
     const { userIds, startDate, endDate } = body;
     if (!Array.isArray(userIds) || userIds.length === 0) {
-      return NextResponse.json({ error: "userIds must be a non-empty array." }, { status: 400 });
+      return apiError("userIds must be a non-empty array.", 400);
     }
     const start = startDate ? new Date(startDate) : null;
     const end = endDate ? new Date(endDate) : null;
@@ -54,6 +52,6 @@ export async function POST(
     return NextResponse.json({ assigned, errors: errors.length ? errors : undefined });
   } catch (e) {
     console.error("Assign program to multiple clients error:", e);
-    return NextResponse.json({ error: "Failed to assign program." }, { status: 500 });
+    return apiError("Failed to assign program.", 500);
   }
 }

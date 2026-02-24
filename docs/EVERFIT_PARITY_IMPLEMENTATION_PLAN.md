@@ -312,12 +312,28 @@ Recommendation: **Do Phase 1 first** (client manager parity and multi-assign). T
 - **UI:** Clients list (search, Active/Archived, group filter, Bulk add, Import CSV); client detail (Archive/Reactivate, Settings, Consultation file); Groups (list, create, edit, manage members); program detail (Assign to multiple clients).  
 
 **Phase 2 – Workout structure (implemented)**  
-- **Schema:** `Exercise`, `WorkoutSection`, `WorkoutSet`, `SectionTemplate`.  
+- **Schema:** `Exercise`, `WorkoutSection`, `WorkoutSet`, `SectionTemplate`, `Program.tags`.  
 - **APIs:**  
   - `GET/POST /api/admin/exercises`, `GET/PATCH/DELETE /api/admin/exercises/[id]`.  
-  - `GET/POST /api/admin/programs/[id]/sections`, `PATCH/DELETE .../sections/[sectionId]`.  
+  - `GET/POST /api/admin/programs/[id]/sections`, `PATCH/DELETE .../sections/[sectionId]`, `POST .../sections/from-template`, `POST .../sections/[sectionId]/clone`.  
   - `POST /api/admin/programs/[id]/sections/[sectionId]/sets`, `PATCH/DELETE .../sets/[setId]`.  
-- **UI:** Program detail shows workout structure (sections + sets) when present. Full builder UI (drag-and-drop, copy/paste, section library) not yet built; APIs are ready.  
+  - `GET/POST/PATCH/DELETE /api/admin/section-templates`, `GET /api/admin/section-templates/[id]`.  
+  - `POST /api/admin/programs/[id]/clone`.  
+  - `PATCH /api/admin/programs/[id]` accepts `tags: string[]`.  
+- **UI – Everfit parity gaps (implemented):**  
+  - **Edit section/set:** Inline edit in workout builder (section: name, type, duration; set: exercise, reps, weight, set type).  
+  - **Reorder sections/sets:** Move up/down in builder (drag-and-drop deferred as enhancement).  
+  - **Section templates:** Save as template per section; “From template” when adding section; section-templates CRUD API.  
+  - **Program tags:** Tags on program (edit form); program list filter by tag.  
+  - **Copy/paste:** Duplicate section in builder; Duplicate program on list/detail.  
+  - **Exercise delete:** Delete button with confirm on exercise library (and optional on edit page).  
+  - **Admin → client messages:** Send message form on client detail.  
+  - **Admin → client tasks:** Add task form on client detail.  
+  - **Pinned metrics:** Multi-select in client settings; keys: weight, body fat %, measurement, etc.  
+  - **Multi-assign dates:** Optional start/end date in assign-to-many form.  
+  - **Client structured program view:** Client program detail shows Workout block (sections/sets) when program has workout data.  
+  - **Demo video:** “Watch demo” link on client program view per set when exercise has `demoVideoUrl`; demo link on exercise library list.  
+  - **Remove from program:** Unassign button labeled “Remove from program” with confirmation.  
 
 **Phases 3–6** — Not yet implemented (calendar/ScheduledWorkout, comments/visibility, analytics/PDF/1RM, AI builder).
 

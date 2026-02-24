@@ -92,5 +92,15 @@ describe("POST /api/admin/programs/[id]/assign", () => {
     const data = await res.json();
     expect(Array.isArray(data.assigned)).toBe(true);
     expect(data.assigned.length).toBe(2);
+    expect(prisma.programAssignment.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          userId: "u1",
+          programId: "p1",
+          startDate: new Date("2025-03-01"),
+          endDate: new Date("2025-03-31"),
+        }),
+      })
+    );
   });
 });

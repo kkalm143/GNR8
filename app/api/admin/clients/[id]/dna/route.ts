@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { Role } from "@prisma/client";
 
@@ -7,15 +7,13 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: userId } = await params;
   const client = await prisma.user.findFirst({
     where: { id: userId, role: Role.client },
   });
-  if (!client) return NextResponse.json({ error: "Client not found." }, { status: 404 });
+  if (!client) return apiError("Client not found.", 404);
   try {
     const body = await request.json();
     const { fieldValues, summary, rawFileUrl } = body;
@@ -30,6 +28,6 @@ export async function POST(
     return NextResponse.json(result);
   } catch (e) {
     console.error("Create DNA result error:", e);
-    return NextResponse.json({ error: "Failed to create DNA result." }, { status: 500 });
+    return apiError("Failed to create DNA result.", 500);
   }
 }

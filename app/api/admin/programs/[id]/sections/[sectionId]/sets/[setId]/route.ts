@@ -1,20 +1,18 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string; sectionId: string; setId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { sectionId, setId } = await params;
   const set = await prisma.workoutSet.findFirst({
     where: { id: setId, sectionId },
   });
-  if (!set) return NextResponse.json({ error: "Set not found." }, { status: 404 });
+  if (!set) return apiError("Set not found.", 404);
   try {
     const body = await request.json();
     const data: Record<string, unknown> = {};
@@ -34,7 +32,7 @@ export async function PATCH(
     return NextResponse.json(updated);
   } catch (e) {
     console.error("Update set error:", e);
-    return NextResponse.json({ error: "Failed to update set." }, { status: 500 });
+    return apiError("Failed to update set.", 500);
   }
 }
 
@@ -42,16 +40,14 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string; sectionId: string; setId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { setId } = await params;
   try {
     await prisma.workoutSet.delete({ where: { id: setId } });
     return new NextResponse(null, { status: 204 });
   } catch (e) {
     console.error("Delete set error:", e);
-    return NextResponse.json({ error: "Set not found or could not be deleted." }, { status: 500 });
+    return apiError("Set not found or could not be deleted.", 500);
   }
 }

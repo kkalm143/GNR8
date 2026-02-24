@@ -107,6 +107,40 @@ export function ClientSettingsForm({
           Allow client to create own workouts
         </span>
       </label>
+      <div>
+        <p className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          Pinned metrics (shown on client dashboard)
+        </p>
+        <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400">
+          Select which metrics appear on the client&apos;s dashboard.
+        </p>
+        <div className="flex flex-wrap gap-4">
+          {[
+            { key: "body_metric:weight", label: "Weight" },
+            { key: "body_metric:body_fat", label: "Body fat %" },
+            { key: "measurement", label: "Measurement" },
+            { key: "body_metric", label: "Body metric (generic)" },
+            { key: "note", label: "Note" },
+          ].map(({ key, label }) => (
+            <label key={key} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.pinnedMetrics.includes(key)}
+                onChange={(e) => {
+                  setSettings((s) => ({
+                    ...s,
+                    pinnedMetrics: e.target.checked
+                      ? [...s.pinnedMetrics, key]
+                      : s.pinnedMetrics.filter((m) => m !== key),
+                  }));
+                }}
+                className="rounded border-zinc-300 dark:border-zinc-600"
+              />
+              <span className="text-sm text-zinc-700 dark:text-zinc-300">{label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
       <div className="pt-4">
         <button
           type="submit"

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { hash } from "bcrypt";
 import { Role } from "@prisma/client";
@@ -32,19 +32,17 @@ function parseCSVLine(line: string): string[] {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   try {
     const text = await request.text();
     if (!text?.trim()) {
-      return NextResponse.json({ error: "CSV body is required." }, { status: 400 });
+      return apiError("CSV body is required.", 400);
     }
     const { headers, rows } = parseCSV(text);
     const emailIndex = headers.findIndex((h) => h.toLowerCase() === "email");
     if (emailIndex === -1) {
-      return NextResponse.json({ error: "CSV must contain an 'email' column." }, { status: 400 });
+      return apiError("CSV must contain an 'email' column.", 400);
     }
     const nameIndex = headers.findIndex((h) => h.toLowerCase() === "name");
     const phoneIndex = headers.findIndex((h) => h.toLowerCase() === "phone");
@@ -108,6 +106,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ created, errors });
   } catch (e) {
     console.error("CSV import error:", e);
-    return NextResponse.json({ error: "Failed to import CSV." }, { status: 500 });
+    return apiError("Failed to import CSV.", 500);
   }
 }

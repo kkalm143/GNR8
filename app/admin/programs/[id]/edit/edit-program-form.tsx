@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 type Props = {
   programId: string;
@@ -12,6 +11,7 @@ type Props = {
     content: string;
     isActive: boolean;
     displayOrder: number;
+    tags: string[];
   };
   className?: string;
 };
@@ -23,6 +23,7 @@ export function EditProgramForm({ programId, initial, className }: Props) {
   const [content, setContent] = useState(initial.content);
   const [isActive, setIsActive] = useState(initial.isActive);
   const [displayOrder, setDisplayOrder] = useState(initial.displayOrder);
+  const [tags, setTags] = useState(initial.tags.join(", "));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -40,6 +41,10 @@ export function EditProgramForm({ programId, initial, className }: Props) {
           content: content || null,
           isActive,
           displayOrder,
+          tags: tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -48,7 +53,6 @@ export function EditProgramForm({ programId, initial, className }: Props) {
         setLoading(false);
         return;
       }
-      router.push(`/admin/programs/${programId}`);
       router.refresh();
     } catch {
       setError("Something went wrong.");
@@ -122,6 +126,18 @@ export function EditProgramForm({ programId, initial, className }: Props) {
             className="w-full max-w-[8rem] rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           />
         </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Tags (comma-separated)
+          </label>
+          <input
+            type="text"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            placeholder="e.g. Strength, Beginner"
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+          />
+        </div>
       </div>
       <div className="mt-6 flex gap-3">
         <button
@@ -129,14 +145,8 @@ export function EditProgramForm({ programId, initial, className }: Props) {
           disabled={loading}
           className="rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--brand-hover)] disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
         >
-          {loading ? "Saving…" : "Save"}
+          {loading ? "Saving…" : "Save details"}
         </button>
-        <Link
-          href={`/admin/programs/${programId}`}
-          className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
-        >
-          Cancel
-        </Link>
       </div>
     </form>
   );

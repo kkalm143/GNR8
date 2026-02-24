@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { hash } from "bcrypt";
 import { Role } from "@prisma/client";
 
 export async function GET(request: Request) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { searchParams } = new URL(request.url);
   const archived = searchParams.get("archived");
   const search = searchParams.get("search")?.trim();
@@ -37,20 +35,18 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
     const { email, name, password, phone, dateOfBirth, timezone } = body;
     if (!email || typeof email !== "string") {
-      return NextResponse.json({ error: "Email is required." }, { status: 400 });
+      return apiError("Email is required.", 400);
     }
     const pass = typeof password === "string" && password.length >= 8 ? password : undefined;
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      return NextResponse.json({ error: "A user with this email already exists." }, { status: 409 });
+      return apiError("A user with this email already exists.", 409);
     }
     const passwordHash = pass
       ? await hash(pass, 10)
@@ -83,6 +79,6 @@ export async function POST(request: Request) {
     return NextResponse.json(user);
   } catch (e) {
     console.error("Create client error:", e);
-    return NextResponse.json({ error: "Failed to create client." }, { status: 500 });
+    return apiError("Failed to create client.", 500);
   }
 }

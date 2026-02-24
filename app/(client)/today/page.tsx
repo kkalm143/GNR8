@@ -44,16 +44,18 @@ export default async function TodayPage() {
           What&apos;s on today
         </h2>
         {assignmentCount === 0 ? (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            No workouts scheduled yet. Your coach may assign programs and
-            workouts here once your training calendar is set up.
-          </p>
-          <Link
-            href="/programs"
-            className="mt-3 inline-block font-medium text-[var(--brand)] hover:underline"
-          >
-            View programs →
-          </Link>
+          <>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              No workouts scheduled yet. Your coach may assign programs and
+              workouts here once your training calendar is set up.
+            </p>
+            <Link
+              href="/programs"
+              className="mt-3 inline-block font-medium text-[var(--brand)] hover:underline"
+            >
+              View programs →
+            </Link>
+          </>
         ) : (
           <>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">

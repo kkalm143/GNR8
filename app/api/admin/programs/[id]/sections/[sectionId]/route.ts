@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string; sectionId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { sectionId } = await params;
   const section = await prisma.workoutSection.findUnique({ where: { id: sectionId } });
-  if (!section) return NextResponse.json({ error: "Section not found." }, { status: 404 });
+  if (!section) return apiError("Section not found.", 404);
   try {
     const body = await request.json();
     const { type, name, displayOrder, durationSeconds, metadata } = body;
@@ -29,7 +27,7 @@ export async function PATCH(
     return NextResponse.json(updated);
   } catch (e) {
     console.error("Update section error:", e);
-    return NextResponse.json({ error: "Failed to update section." }, { status: 500 });
+    return apiError("Failed to update section.", 500);
   }
 }
 
@@ -37,16 +35,14 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string; sectionId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { sectionId } = await params;
   try {
     await prisma.workoutSection.delete({ where: { id: sectionId } });
     return new NextResponse(null, { status: 204 });
   } catch (e) {
     console.error("Delete section error:", e);
-    return NextResponse.json({ error: "Section not found or could not be deleted." }, { status: 500 });
+    return apiError("Section not found or could not be deleted.", 500);
   }
 }

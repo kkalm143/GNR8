@@ -15,7 +15,21 @@ export default async function ClientProgramDetailPage({
   const { id } = await params;
   const assignment = await prisma.programAssignment.findFirst({
     where: { userId, programId: id },
-    include: { program: true },
+    include: {
+      program: {
+        include: {
+          workoutSections: {
+            orderBy: { displayOrder: "asc" },
+            include: {
+              sets: {
+                orderBy: { displayOrder: "asc" },
+                include: { exercise: { select: { id: true, name: true, demoVideoUrl: true } } },
+              },
+            },
+          },
+        },
+      },
+    },
   });
   if (!assignment) notFound();
   const { program } = assignment;
@@ -54,6 +68,48 @@ export default async function ClientProgramDetailPage({
           </h2>
           <div className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
             {program.content}
+          </div>
+        </div>
+      )}
+      {program.workoutSections && program.workoutSections.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Workout</h2>
+          <div className="mt-4 space-y-6">
+            {program.workoutSections.map((sec) => (
+              <div key={sec.id} className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+                <h3 className="font-medium text-zinc-900 dark:text-zinc-50">
+                  {sec.name || `${sec.type} section`}
+                  {sec.durationSeconds != null && ` (${sec.durationSeconds}s)`}
+                </h3>
+                <ul className="mt-3 space-y-2">
+                  {sec.sets.map((s) => (
+                    <li key={s.id} className="flex flex-wrap items-baseline gap-2 text-sm">
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                        {s.exercise?.name ?? s.customLabel ?? "Set"}
+                      </span>
+                      {[s.reps, s.repRange, s.weight].filter(Boolean).length > 0 && (
+                        <span className="text-zinc-600 dark:text-zinc-400">
+                          — {[s.reps, s.repRange, s.weight].filter(Boolean).join(" ")}
+                        </span>
+                      )}
+                      {s.setType !== "normal" && (
+                        <span className="text-zinc-500 dark:text-zinc-400">({s.setType})</span>
+                      )}
+                      {s.exercise?.demoVideoUrl && (
+                        <a
+                          href={s.exercise.demoVideoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--brand)] hover:underline"
+                        >
+                          Watch demo
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       )}

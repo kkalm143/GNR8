@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 type Props = {
   clientId: string;
@@ -48,7 +47,6 @@ export function EditClientForm({ clientId, initial, className }: Props) {
         setLoading(false);
         return;
       }
-      router.push(`/admin/clients/${clientId}`);
       router.refresh();
     } catch {
       setError("Something went wrong.");
@@ -122,20 +120,14 @@ export function EditClientForm({ clientId, initial, className }: Props) {
           />
         </div>
       </div>
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6">
         <button
           type="submit"
           disabled={loading}
           className="rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--brand-hover)] disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
         >
-          {loading ? "Saving…" : "Save"}
+          {loading ? "Saving…" : "Save profile"}
         </button>
-        <Link
-          href={`/admin/clients/${clientId}`}
-          className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
-        >
-          Cancel
-        </Link>
       </div>
     </form>
   );

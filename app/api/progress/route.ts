@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAuth, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { ProgressEntryType } from "@prisma/client";
 
@@ -12,10 +12,8 @@ const VALID_TYPES: ProgressEntryType[] = [
 ];
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAuth();
+  if (session instanceof NextResponse) return session;
   const entries = await prisma.progressEntry.findMany({
     where: { userId: session.user.id },
     include: {
@@ -29,25 +27,23 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAuth();
+  if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
     const { content, programAssignmentId, type, value, loggedAt } = body;
     if (!content || typeof content !== "string" || !content.trim()) {
-      return NextResponse.json({ error: "Content is required." }, { status: 400 });
+      return apiError("Content is required.", 400);
     }
     if (programAssignmentId != null) {
       if (typeof programAssignmentId !== "string") {
-        return NextResponse.json({ error: "Invalid programAssignmentId." }, { status: 400 });
+        return apiError("Invalid programAssignmentId.", 400);
       }
       const assignment = await prisma.programAssignment.findFirst({
         where: { id: programAssignmentId, userId: session.user.id },
       });
       if (!assignment) {
-        return NextResponse.json({ error: "Assignment not found." }, { status: 404 });
+        return apiError("Assignment not found.", 404);
       }
     }
     const entryType =
@@ -73,6 +69,6 @@ export async function POST(request: Request) {
     return NextResponse.json(entry);
   } catch (e) {
     console.error("Create progress entry error:", e);
-    return NextResponse.json({ error: "Failed to save progress." }, { status: 500 });
+    return apiError("Failed to save progress.", 500);
   }
 }

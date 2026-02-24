@@ -9,6 +9,8 @@ export function AssignProgramToManyForm({ programId }: { programId: string }) {
   const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [loaded, setLoaded] = useState(false);
@@ -32,10 +34,15 @@ export function AssignProgramToManyForm({ programId }: { programId: string }) {
     setError("");
     setLoading(true);
     try {
+      const body: { userIds: string[]; startDate?: string; endDate?: string } = {
+        userIds: Array.from(selected),
+      };
+      if (startDate) body.startDate = startDate;
+      if (endDate) body.endDate = endDate;
       const res = await fetch(`/api/admin/programs/${programId}/assign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userIds: Array.from(selected) }),
+        body: JSON.stringify(body),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -75,6 +82,26 @@ export function AssignProgramToManyForm({ programId }: { programId: string }) {
       <p className="text-sm text-zinc-600 dark:text-zinc-400">
         Select clients to assign this program to (only active clients shown).
       </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Start date (optional)</label>
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">End date (optional)</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-full rounded-md border border-zinc-300 px-3 py-2 text-zinc-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+          />
+        </div>
+      </div>
       <div className="max-h-48 overflow-y-auto rounded border border-zinc-200 p-2 dark:border-zinc-800">
         {clients.length === 0 ? (
           <p className="py-2 text-sm text-zinc-500">No active clients.</p>

@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const groups = await prisma.clientGroup.findMany({
     orderBy: { name: "asc" },
     include: { _count: { select: { users: true } } },
@@ -15,15 +13,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
     const { name, description } = body;
     if (!name || typeof name !== "string" || !name.trim()) {
-      return NextResponse.json({ error: "Name is required." }, { status: 400 });
+      return apiError("Name is required.", 400);
     }
     const group = await prisma.clientGroup.create({
       data: {
@@ -34,6 +30,6 @@ export async function POST(request: Request) {
     return NextResponse.json(group);
   } catch (e) {
     console.error("Create client group error:", e);
-    return NextResponse.json({ error: "Failed to create group." }, { status: 500 });
+    return apiError("Failed to create group.", 500);
   }
 }

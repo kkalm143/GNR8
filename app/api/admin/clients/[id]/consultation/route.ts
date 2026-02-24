@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { put } from "@vercel/blob";
 import { Role } from "@prisma/client";
@@ -10,17 +10,15 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: userId } = await params;
   const client = await prisma.user.findFirst({
     where: { id: userId, role: Role.client },
     include: { clientProfile: true },
   });
   if (!client?.clientProfile?.consultationFileUrl) {
-    return NextResponse.json({ error: "No consultation file attached." }, { status: 404 });
+    return apiError("No consultation file attached.", 404);
   }
   return NextResponse.redirect(client.clientProfile.consultationFileUrl, 302);
 }
@@ -29,33 +27,28 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: userId } = await params;
   const client = await prisma.user.findFirst({
     where: { id: userId, role: Role.client },
     include: { clientProfile: true },
   });
   if (!client?.clientProfile) {
-    return NextResponse.json({ error: "Client not found." }, { status: 404 });
+    return apiError("Client not found.", 404);
   }
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     if (!file || !(file instanceof File)) {
-      return NextResponse.json({ error: "No file provided." }, { status: 400 });
+      return apiError("No file provided.", 400);
     }
     if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: "File too large (max 20 MB)." }, { status: 400 });
+      return apiError("File too large (max 20 MB).", 400);
     }
     const token = process.env.BLOB_READ_WRITE_TOKEN;
     if (!token) {
-      return NextResponse.json(
-        { error: "File upload not configured. Set BLOB_READ_WRITE_TOKEN." },
-        { status: 503 }
-      );
+      return apiError("File upload not configured. Set BLOB_READ_WRITE_TOKEN.", 503);
     }
     const blob = await put(
       `consultation/${userId}/${Date.now()}-${file.name}`,
@@ -69,6 +62,6 @@ export async function POST(
     return NextResponse.json({ url: blob.url });
   } catch (e) {
     console.error("Consultation upload error:", e);
-    return NextResponse.json({ error: "Upload failed." }, { status: 500 });
+    return apiError("Upload failed.", 500);
   }
 }

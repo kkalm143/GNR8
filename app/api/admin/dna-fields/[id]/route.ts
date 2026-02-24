@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
   try {
     const body = await request.json();
@@ -31,7 +29,7 @@ export async function PATCH(
     return NextResponse.json(field);
   } catch (e) {
     console.error("Update DNA field error:", e);
-    return NextResponse.json({ error: "Failed to update field." }, { status: 500 });
+    return apiError("Failed to update field.", 500);
   }
 }
 
@@ -39,16 +37,14 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
   try {
     await prisma.dNAInterpretationField.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
   } catch (e) {
     console.error("Delete DNA field error:", e);
-    return NextResponse.json({ error: "Failed to delete field." }, { status: 500 });
+    return apiError("Failed to delete field.", 500);
   }
 }

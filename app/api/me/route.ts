@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAuth, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAuth();
+  if (session instanceof NextResponse) return session;
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: { clientProfile: true },
   });
-  if (!user) return NextResponse.json({ error: "User not found." }, { status: 404 });
+  if (!user) return apiError("User not found.", 404);
   return NextResponse.json({
     id: user.id,
     email: user.email,
@@ -29,16 +27,14 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAuth();
+  if (session instanceof NextResponse) return session;
   const userId = session.user.id;
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: { clientProfile: true },
   });
-  if (!user) return NextResponse.json({ error: "User not found." }, { status: 404 });
+  if (!user) return apiError("User not found.", 404);
   try {
     const body = await request.json();
     const { name, phone, timezone, dateOfBirth } = body;
@@ -77,6 +73,6 @@ export async function PATCH(request: Request) {
     return NextResponse.json(updated);
   } catch (e) {
     console.error("Update profile error:", e);
-    return NextResponse.json({ error: "Failed to update profile." }, { status: 500 });
+    return apiError("Failed to update profile.", 500);
   }
 }

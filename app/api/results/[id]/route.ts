@@ -1,21 +1,19 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAuth, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAuth();
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
   const result = await prisma.dNAResult.findFirst({
     where: { id, userId: session.user.id },
   });
   if (!result) {
-    return NextResponse.json({ error: "Result not found." }, { status: 404 });
+    return apiError("Result not found.", 404);
   }
   const fields = await prisma.dNAInterpretationField.findMany({
     orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { Role } from "@prisma/client";
 
@@ -7,28 +7,26 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: userId } = await params;
   const client = await prisma.user.findFirst({
     where: { id: userId, role: Role.client },
   });
-  if (!client) return NextResponse.json({ error: "Client not found." }, { status: 404 });
+  if (!client) return apiError("Client not found.", 404);
   try {
     const body = await request.json();
     const { programId, startDate, endDate } = body;
     if (!programId || typeof programId !== "string") {
-      return NextResponse.json({ error: "programId is required." }, { status: 400 });
+      return apiError("programId is required.", 400);
     }
     const program = await prisma.program.findUnique({ where: { id: programId } });
-    if (!program) return NextResponse.json({ error: "Program not found." }, { status: 404 });
+    if (!program) return apiError("Program not found.", 404);
     const existing = await prisma.programAssignment.findUnique({
       where: { userId_programId: { userId, programId } },
     });
     if (existing) {
-      return NextResponse.json({ error: "Client is already assigned to this program." }, { status: 409 });
+      return apiError("Client is already assigned to this program.", 409);
     }
     const assignment = await prisma.programAssignment.create({
       data: {
@@ -42,6 +40,6 @@ export async function POST(
     return NextResponse.json(assignment);
   } catch (e) {
     console.error("Assign program error:", e);
-    return NextResponse.json({ error: "Failed to assign program." }, { status: 500 });
+    return apiError("Failed to assign program.", 500);
   }
 }

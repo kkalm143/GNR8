@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useTransition } from "react";
+import { featureFlags } from "@/lib/feature-flags";
 
 type ClientGroup = { id: string; name: string; _count?: { users: number } };
 
@@ -88,7 +89,7 @@ export function ClientListFilters({
       >
         Archived
       </Link>
-      {groups.length > 0 && (
+      {featureFlags.groups && groups.length > 0 && (
         <>
           <span className="text-zinc-400 dark:text-zinc-500">|</span>
           <label className="text-sm text-zinc-600 dark:text-zinc-400" htmlFor="client-group">

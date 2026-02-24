@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
   const exercise = await prisma.exercise.findUnique({ where: { id } });
-  if (!exercise) return NextResponse.json({ error: "Exercise not found." }, { status: 404 });
+  if (!exercise) return apiError("Exercise not found.", 404);
   return NextResponse.json(exercise);
 }
 
@@ -20,13 +18,11 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
   const existing = await prisma.exercise.findUnique({ where: { id } });
-  if (!existing) return NextResponse.json({ error: "Exercise not found." }, { status: 404 });
+  if (!existing) return apiError("Exercise not found.", 404);
   try {
     const body = await request.json();
     const { name, description, demoVideoUrl } = body;
@@ -41,7 +37,7 @@ export async function PATCH(
     return NextResponse.json(exercise);
   } catch (e) {
     console.error("Update exercise error:", e);
-    return NextResponse.json({ error: "Failed to update exercise." }, { status: 500 });
+    return apiError("Failed to update exercise.", 500);
   }
 }
 
@@ -49,16 +45,14 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
   try {
     await prisma.exercise.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
   } catch (e) {
     console.error("Delete exercise error:", e);
-    return NextResponse.json({ error: "Exercise not found or could not be deleted." }, { status: 500 });
+    return apiError("Exercise not found or could not be deleted.", 500);
   }
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { signOut } from "next-auth/react";
+import { featureFlags } from "@/lib/feature-flags";
 
 export function AdminNav() {
   return (
@@ -18,12 +19,14 @@ export function AdminNav() {
       >
         Clients
       </Link>
-      <Link
-        href="/admin/groups"
-        className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-      >
-        Groups
-      </Link>
+      {featureFlags.groups && (
+        <Link
+          href="/admin/groups"
+          className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+        >
+          Groups
+        </Link>
+      )}
       <Link
         href="/admin/dna/fields"
         className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"

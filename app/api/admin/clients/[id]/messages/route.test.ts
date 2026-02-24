@@ -32,7 +32,7 @@ describe("POST /api/admin/clients/[id]/messages", () => {
     expect(res.status).toBe(401);
   });
 
-  it("returns 403 when not admin", async () => {
+  it("returns 401 when not admin", async () => {
     vi.mocked(auth).mockResolvedValue({ user: { id: "c2", role: "client" } } as any);
     const res = await POST(
       new Request("http://localhost/api/admin/clients/c1/messages", {
@@ -42,7 +42,7 @@ describe("POST /api/admin/clients/[id]/messages", () => {
       }),
       { params: Promise.resolve({ id: "c1" }) }
     );
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(401);
   });
 
   it("returns 404 when client not found", async () => {

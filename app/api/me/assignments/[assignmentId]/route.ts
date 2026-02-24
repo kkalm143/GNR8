@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAuth, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { AssignmentStatus } from "@prisma/client";
 
@@ -9,25 +9,20 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ assignmentId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAuth();
+  if (session instanceof NextResponse) return session;
   const { assignmentId } = await params;
   const assignment = await prisma.programAssignment.findFirst({
     where: { id: assignmentId, userId: session.user.id },
   });
   if (!assignment) {
-    return NextResponse.json({ error: "Assignment not found." }, { status: 404 });
+    return apiError("Assignment not found.", 404);
   }
   try {
     const body = await request.json();
     const { status } = body;
     if (!status || !VALID_STATUSES.includes(status)) {
-      return NextResponse.json(
-        { error: "Valid status required: assigned, in_progress, or completed." },
-        { status: 400 }
-      );
+      return apiError("Valid status required: assigned, in_progress, or completed.", 400);
     }
     const data: { status: AssignmentStatus; completedAt?: Date | null } = {
       status,
@@ -45,6 +40,6 @@ export async function PATCH(
     return NextResponse.json(updated);
   } catch (e) {
     console.error("Update assignment status error:", e);
-    return NextResponse.json({ error: "Failed to update status." }, { status: 500 });
+    return apiError("Failed to update status.", 500);
   }
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { hash } from "bcrypt";
 import { Role } from "@prisma/client";
@@ -8,17 +8,15 @@ const MIN_BULK = 2;
 const MAX_BULK = 8;
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
     const { clients } = body;
     if (!Array.isArray(clients) || clients.length < MIN_BULK || clients.length > MAX_BULK) {
-      return NextResponse.json(
-        { error: `clients must be an array of between ${MIN_BULK} and ${MAX_BULK} items.` },
-        { status: 400 }
+      return apiError(
+        `clients must be an array of between ${MIN_BULK} and ${MAX_BULK} items.`,
+        400
       );
     }
     const created: Array<{ id: string; email: string; name: string | null }> = [];
@@ -70,6 +68,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ created, errors: errors.length ? errors : undefined });
   } catch (e) {
     console.error("Bulk create clients error:", e);
-    return NextResponse.json({ error: "Failed to create clients." }, { status: 500 });
+    return apiError("Failed to create clients.", 500);
   }
 }

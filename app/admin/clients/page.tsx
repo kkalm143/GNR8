@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { featureFlags } from "@/lib/feature-flags";
 import { prisma } from "@/lib/db";
 import { Role } from "@prisma/client";
 import { ClientListFilters } from "./client-list-filters";
@@ -11,7 +12,7 @@ export default async function AdminClientsPage({
   const params = await searchParams;
   const search = (params.search ?? "").trim();
   const archived = params.archived === "true";
-  const groupId = (params.groupId ?? "").trim() || undefined;
+  const groupId = featureFlags.groups ? ((params.groupId ?? "").trim() || undefined) : undefined;
 
   const where: Parameters<typeof prisma.user.findMany>[0]["where"] = {
     role: Role.client,
@@ -88,15 +89,12 @@ export default async function AdminClientsPage({
               <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                 Status
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                Actions
-              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200 bg-white dark:divide-zinc-800 dark:bg-zinc-900">
             {clients.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
+                <td colSpan={4} className="px-4 py-8 text-center text-zinc-500 dark:text-zinc-400">
                   {archived ? "No archived clients." : "No clients yet. Add one to get started."}
                 </td>
               </tr>
@@ -104,7 +102,12 @@ export default async function AdminClientsPage({
               clients.map((c) => (
                 <tr key={c.id}>
                   <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                    {c.name ?? "—"}
+                    <Link
+                      href={`/admin/clients/${c.id}`}
+                      className="hover:underline focus:underline"
+                    >
+                      {c.name ?? "—"}
+                    </Link>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
                     {c.email}
@@ -122,21 +125,6 @@ export default async function AdminClientsPage({
                         Active
                       </span>
                     )}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right text-sm">
-                    <Link
-                      href={`/admin/clients/${c.id}`}
-                      className="font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-                    >
-                      View
-                    </Link>
-                    <span className="mx-2 text-zinc-300 dark:text-zinc-600">|</span>
-                    <Link
-                      href={`/admin/clients/${c.id}/edit`}
-                      className="font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-                    >
-                      Edit
-                    </Link>
                   </td>
                 </tr>
               ))

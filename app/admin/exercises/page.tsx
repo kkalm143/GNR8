@@ -5,6 +5,7 @@ import { DeleteExerciseButton } from "./delete-exercise-button";
 export default async function AdminExercisesPage() {
   const exercises = await prisma.exercise.findMany({
     orderBy: { name: "asc" },
+    select: { id: true, name: true, description: true, demoVideoUrl: true },
   });
   return (
     <div>
@@ -36,6 +37,16 @@ export default async function AdminExercisesPage() {
               <span className="font-medium text-zinc-900 dark:text-zinc-50">{e.name}</span>
               {e.description && (
                 <span className="text-sm text-zinc-500 dark:text-zinc-400 truncate max-w-xs">{e.description}</span>
+              )}
+              {e.demoVideoUrl && (
+                <a
+                  href={e.demoVideoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+                >
+                  Watch demo
+                </a>
               )}
               <div className="flex items-center gap-3">
                 <Link

@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const programs = await prisma.program.findMany({
     orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
     include: { _count: { select: { assignments: true } } },
@@ -15,15 +13,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
     const { name, description, content, isActive, displayOrder } = body;
     if (!name || typeof name !== "string") {
-      return NextResponse.json({ error: "Name is required." }, { status: 400 });
+      return apiError("Name is required.", 400);
     }
     const program = await prisma.program.create({
       data: {
@@ -37,6 +33,6 @@ export async function POST(request: Request) {
     return NextResponse.json(program);
   } catch (e) {
     console.error("Create program error:", e);
-    return NextResponse.json({ error: "Failed to create program." }, { status: 500 });
+    return apiError("Failed to create program.", 500);
   }
 }

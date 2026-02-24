@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: programId } = await params;
   const program = await prisma.program.findUnique({
     where: { id: programId },
@@ -25,7 +23,7 @@ export async function GET(
       },
     },
   });
-  if (!program) return NextResponse.json({ error: "Program not found." }, { status: 404 });
+  if (!program) return apiError("Program not found.", 404);
   return NextResponse.json(program.workoutSections);
 }
 
@@ -33,13 +31,11 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: programId } = await params;
   const program = await prisma.program.findUnique({ where: { id: programId } });
-  if (!program) return NextResponse.json({ error: "Program not found." }, { status: 404 });
+  if (!program) return apiError("Program not found.", 404);
   try {
     const body = await request.json();
     const { type, name, displayOrder, durationSeconds, metadata } = body;
@@ -61,6 +57,6 @@ export async function POST(
     return NextResponse.json(section);
   } catch (e) {
     console.error("Create section error:", e);
-    return NextResponse.json({ error: "Failed to create section." }, { status: 500 });
+    return apiError("Failed to create section.", 500);
   }
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 import { Role } from "@prisma/client";
 
@@ -7,15 +7,13 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string; resultId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: userId, resultId } = await params;
   const result = await prisma.dNAResult.findFirst({
     where: { id: resultId, userId },
   });
-  if (!result) return NextResponse.json({ error: "DNA result not found." }, { status: 404 });
+  if (!result) return apiError("DNA result not found.", 404);
   return NextResponse.json(result);
 }
 
@@ -23,15 +21,13 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string; resultId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: userId, resultId } = await params;
   const existing = await prisma.dNAResult.findFirst({
     where: { id: resultId, userId },
   });
-  if (!existing) return NextResponse.json({ error: "DNA result not found." }, { status: 404 });
+  if (!existing) return apiError("DNA result not found.", 404);
   try {
     const body = await request.json();
     const { fieldValues, summary, rawFileUrl } = body;
@@ -46,7 +42,7 @@ export async function PATCH(
     return NextResponse.json(result);
   } catch (e) {
     console.error("Update DNA result error:", e);
-    return NextResponse.json({ error: "Failed to update DNA result." }, { status: 500 });
+    return apiError("Failed to update DNA result.", 500);
   }
 }
 
@@ -54,20 +50,18 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string; resultId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id: userId, resultId } = await params;
   const existing = await prisma.dNAResult.findFirst({
     where: { id: resultId, userId },
   });
-  if (!existing) return NextResponse.json({ error: "DNA result not found." }, { status: 404 });
+  if (!existing) return apiError("DNA result not found.", 404);
   try {
     await prisma.dNAResult.delete({ where: { id: resultId } });
     return new NextResponse(null, { status: 204 });
   } catch (e) {
     console.error("Delete DNA result error:", e);
-    return NextResponse.json({ error: "Failed to delete DNA result." }, { status: 500 });
+    return apiError("Failed to delete DNA result.", 500);
   }
 }

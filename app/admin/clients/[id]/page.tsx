@@ -7,6 +7,7 @@ import { ArchiveButton } from "./archive-button";
 import { AssignProgramForm } from "./assign-program-form";
 import { ConsultationFileSection } from "./consultation-file-section";
 import { DeleteDNAResultButton } from "./delete-dna-result-button";
+import { EditClientForm } from "./edit/edit-client-form";
 import { SendMessageForm } from "./send-message-form";
 import { UnassignButton } from "./unassign-button";
 
@@ -46,26 +47,13 @@ export default async function ClientDetailPage({
   if (!client) notFound();
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <Link
           href="/admin/clients"
           className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
         >
           ← Clients
         </Link>
-      </div>
-      <div className="mb-8 flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-            {client.name ?? client.email}
-          </h1>
-          <p className="mt-1 text-zinc-600 dark:text-zinc-400">{client.email}</p>
-          {client.clientProfile?.phone && (
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-              Phone: {client.clientProfile.phone}
-            </p>
-          )}
-        </div>
         <div className="flex flex-wrap items-center gap-2">
           {client.archivedAt && (
             <span className="rounded bg-zinc-200 px-2 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300">
@@ -83,18 +71,39 @@ export default async function ClientDetailPage({
           >
             Settings
           </Link>
-          <Link
-            href={`/admin/clients/${id}/edit`}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          >
-            Edit profile
-          </Link>
         </div>
       </div>
 
+      <section className="mb-8">
+        <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">Profile</h2>
+        <EditClientForm
+          clientId={id}
+          initial={{
+            name: client.name ?? "",
+            email: client.email,
+            phone: client.clientProfile?.phone ?? "",
+            timezone: client.clientProfile?.timezone ?? "",
+            dateOfBirth: client.clientProfile?.dateOfBirth
+              ? client.clientProfile.dateOfBirth.toISOString().slice(0, 10)
+              : "",
+          }}
+          className="max-w-md"
+        />
+      </section>
+
       <ConsultationFileSection clientId={id} consultationFileUrl={client.clientProfile?.consultationFileUrl ?? null} />
 
-      <section>
+      <section className="mt-8">
+        <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">Send message</h2>
+        <SendMessageForm clientId={id} />
+      </section>
+
+      <section className="mt-8">
+        <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">Add task</h2>
+        <AddTaskForm clientId={id} />
+      </section>
+
+      <section className="mt-8">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
             DNA results

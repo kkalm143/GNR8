@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdmin, apiError } from "@/lib/api-helpers";
 import { prisma } from "@/lib/db";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
   const group = await prisma.clientGroup.findUnique({
     where: { id },
@@ -19,7 +17,7 @@ export async function GET(
       },
     },
   });
-  if (!group) return NextResponse.json({ error: "Group not found." }, { status: 404 });
+  if (!group) return apiError("Group not found.", 404);
   return NextResponse.json(group);
 }
 
@@ -27,13 +25,11 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
   const existing = await prisma.clientGroup.findUnique({ where: { id } });
-  if (!existing) return NextResponse.json({ error: "Group not found." }, { status: 404 });
+  if (!existing) return apiError("Group not found.", 404);
   try {
     const body = await request.json();
     const { name, description } = body;
@@ -47,7 +43,7 @@ export async function PATCH(
     return NextResponse.json(group);
   } catch (e) {
     console.error("Update client group error:", e);
-    return NextResponse.json({ error: "Failed to update group." }, { status: 500 });
+    return apiError("Failed to update group.", 500);
   }
 }
 
@@ -55,16 +51,14 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user || (session.user as { role?: string }).role !== "admin") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const session = await requireAdmin();
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
   try {
     await prisma.clientGroup.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
   } catch (e) {
     console.error("Delete client group error:", e);
-    return NextResponse.json({ error: "Group not found or could not be deleted." }, { status: 500 });
+    return apiError("Group not found or could not be deleted.", 500);
   }
 }

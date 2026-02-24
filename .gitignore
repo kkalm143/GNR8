@@ -20,6 +20,9 @@
 # production
 /build
 
+# large reference samples (keep README tracked)
+docs/reference-samples/*.txt
+
 # misc
 .DS_Store
 *.pem
