@@ -108,8 +108,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-xl px-4 py-2 font-medium text-white transition-all hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
-        style={{ background: "var(--gradient-cta)" }}
+        className="bg-gradient-cta rounded-xl px-4 py-2 font-medium text-white transition-all disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
       >
         {loading ? "Signing in…" : "Log in"}
       </button>

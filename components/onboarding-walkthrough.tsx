@@ -55,8 +55,7 @@ export function OnboardingWalkthrough({ onComplete, onSkip }: OnboardingWalkthro
             <button
               type="button"
               onClick={handleNext}
-              className="rounded-xl px-4 py-2 text-sm font-medium text-white transition-all hover:brightness-110"
-              style={{ background: "var(--gradient-cta)" }}
+              className="bg-gradient-cta rounded-xl px-4 py-2 text-sm font-medium text-white transition-all"
             >
               {isLast ? "Get started" : "Next"}
             </button>

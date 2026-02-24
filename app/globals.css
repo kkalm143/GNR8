@@ -79,3 +79,21 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Gradient utilities – use these instead of inline style so variables resolve */
+.bg-gradient-page {
+  background-color: var(--surface);
+  background-image: var(--gradient-page);
+}
+.bg-gradient-hero {
+  background-color: var(--brand);
+  background-image: var(--gradient-hero);
+}
+.bg-gradient-cta {
+  background-color: var(--brand);
+  background-image: var(--gradient-cta);
+  color: var(--brand-foreground);
+}
+.bg-gradient-cta:hover {
+  filter: brightness(1.08);
+}

@@ -17,7 +17,7 @@ export default async function HomePage() {
     redirect("/dashboard");
   }
   return (
-    <div className="flex min-h-screen flex-col" style={{ background: "var(--gradient-hero)" }}>
+    <div className="flex min-h-screen flex-col bg-gradient-hero">
       <main className="flex flex-1 flex-col items-center justify-center gap-10 px-6 py-16">
         <div className="flex flex-col items-center gap-4 text-center">
           <Image src="/logo.svg" alt="GNR8" width={160} height={48} className="h-12 w-auto brightness-0 invert" />
@@ -33,8 +33,7 @@ export default async function HomePage() {
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href="/login"
-            className="rounded-xl px-6 py-3 font-medium text-white transition-all hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-teal-800 shadow-md"
-            style={{ background: "var(--gradient-cta)" }}
+            className="bg-gradient-cta rounded-xl px-6 py-3 font-medium text-white shadow-md transition-all hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-teal-800"
           >
             Log in
           </Link>

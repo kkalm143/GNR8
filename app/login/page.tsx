@@ -18,20 +18,19 @@ export default async function LoginPage({
         : "Log in to GNR8";
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--surface)]" style={{ background: "var(--gradient-page)" }}>
+    <div className="flex min-h-screen flex-col bg-gradient-page">
       <main className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-12">
         {!mode && (
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/login?mode=admin"
-              className="rounded-xl px-5 py-2.5 text-sm font-medium text-white transition-all hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 dark:focus:ring-offset-zinc-950"
-              style={{ background: "var(--gradient-cta)" }}
+              className="bg-gradient-cta rounded-xl px-5 py-2.5 text-sm font-medium text-white transition-all focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 dark:focus:ring-offset-zinc-950"
             >
               Log in as admin
             </Link>
             <Link
               href="/login?mode=client"
-              className="rounded-xl border-2 border-[var(--border-strong)] bg-[var(--surface-card)] px-5 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-[var(--surface-elevated)] dark:text-zinc-100 dark:hover:bg-zinc-800"
+              className="rounded-xl border-2 border-zinc-300 bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
             >
               Log in as client
             </Link>

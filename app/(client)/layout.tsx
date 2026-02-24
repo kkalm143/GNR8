@@ -25,7 +25,7 @@ export default async function ClientLayout({
     role === "admin" && viewAs === "client";
   return (
     <OnboardingGate>
-      <div className="min-h-screen bg-surface" style={{ background: "var(--gradient-page)" }}>
+      <div className="min-h-screen bg-gradient-page">
         <header className="border-b border-[var(--border-subtle)] bg-[var(--surface-elevated)] shadow-sm">
           <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
             <Link

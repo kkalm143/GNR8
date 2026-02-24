@@ -4,7 +4,7 @@ import { RegisterForm } from "./register-form";
 
 export default function RegisterPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--surface)]" style={{ background: "var(--gradient-page)" }}>
+    <div className="flex min-h-screen flex-col bg-gradient-page">
       <main className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-12">
         <div className="w-full max-w-sm rounded-xl bg-[var(--surface-card)] p-6" style={{ boxShadow: "var(--shadow-card)" }}>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
