@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { EditGroupForm } from "../edit-group-form";
+import { EditGroupForm } from "../../edit-group-form";
 
 export default async function EditGroupPage({
   params,

@@ -59,7 +59,7 @@ export default async function TodayPage() {
         ) : (
           <>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              {nextAssignment
+              {nextAssignment && "program" in nextAssignment
                 ? `Next up: ${nextAssignment.program.name}`
                 : "You have program assignments. Open Programs to see details and track workouts."}
             </p>
