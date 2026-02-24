@@ -44,7 +44,7 @@ export default async function ClientSettingsPage({
           allowRearrange: settings.allowRearrange,
           replaceExercise: settings.replaceExercise,
           allowCreateWorkouts: settings.allowCreateWorkouts,
-          pinnedMetrics: Array.isArray(settings.pinnedMetrics) ? settings.pinnedMetrics : [],
+          pinnedMetrics: Array.isArray(settings.pinnedMetrics) ? (settings.pinnedMetrics as string[]) : [],
         }}
       />
     </div>

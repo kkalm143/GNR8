@@ -7,28 +7,36 @@ export default async function TodayPage() {
   const userId = session?.user?.id;
   const name = session?.user?.name ?? session?.user?.email ?? "there";
 
-  const [assignmentCount, resultsCount, nextAssignment, tasksDueToday] = userId
-    ? await Promise.all([
-        prisma.programAssignment.count({ where: { userId } }),
-        prisma.dNAResult.count({ where: { userId } }),
-        prisma.programAssignment.findFirst({
-          where: { userId },
-          orderBy: { startDate: "asc" },
-          include: { program: { select: { id: true, name: true } } },
-        }),
-        (async () => {
-          const now = new Date();
-          const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-          return prisma.task.count({
-            where: {
-              assignedToUserId: userId,
-              completedAt: null,
-              dueDate: { gte: now, lte: todayEnd },
-            },
-          });
-        })(),
-      ]).then(([a, r, n, t]) => [a, r, n, t])
-    : [0, 0, null, 0];
+  let assignmentCount = 0;
+  let resultsCount = 0;
+  let nextAssignment: { program: { id: string; name: string } } | null = null;
+  let tasksDueToday = 0;
+  if (userId) {
+    const [a, r, n, t] = await Promise.all([
+      prisma.programAssignment.count({ where: { userId } }),
+      prisma.dNAResult.count({ where: { userId } }),
+      prisma.programAssignment.findFirst({
+        where: { userId },
+        orderBy: { startDate: "asc" },
+        include: { program: { select: { id: true, name: true } } },
+      }),
+      (async () => {
+        const now = new Date();
+        const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        return prisma.task.count({
+          where: {
+            assignedToUserId: userId,
+            completedAt: null,
+            dueDate: { gte: now, lte: todayEnd },
+          },
+        });
+      })(),
+    ]);
+    assignmentCount = a;
+    resultsCount = r;
+    nextAssignment = n;
+    tasksDueToday = t;
+  }
 
   return (
     <div>
@@ -59,7 +67,7 @@ export default async function TodayPage() {
         ) : (
           <>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              {nextAssignment && "program" in nextAssignment
+              {nextAssignment?.program?.name
                 ? `Next up: ${nextAssignment.program.name}`
                 : "You have program assignments. Open Programs to see details and track workouts."}
             </p>
@@ -82,12 +90,12 @@ export default async function TodayPage() {
       </section>
 
       <div className="mt-6 flex flex-wrap gap-4">
-        {tasksDueToday > 0 && (
+        {(tasksDueToday ?? 0) > 0 && (
           <Link
             href="/tasks"
             className="font-medium text-zinc-900 underline hover:no-underline dark:text-zinc-50"
           >
-            {tasksDueToday} task{tasksDueToday !== 1 ? "s" : ""} due today →
+            {tasksDueToday} task{(tasksDueToday ?? 0) !== 1 ? "s" : ""} due today →
           </Link>
         )}
         {resultsCount > 0 && (

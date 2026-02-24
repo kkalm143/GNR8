@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { featureFlags } from "@/lib/feature-flags";
 import { prisma } from "@/lib/db";
-import { Role } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 import { ClientListFilters } from "./client-list-filters";
 
 export default async function AdminClientsPage({
@@ -14,7 +14,7 @@ export default async function AdminClientsPage({
   const archived = params.archived === "true";
   const groupId = featureFlags.groups ? ((params.groupId ?? "").trim() || undefined) : undefined;
 
-  const where: Parameters<typeof prisma.user.findMany>[0]["where"] = {
+  const where: Prisma.UserWhereInput = {
     role: Role.client,
     archivedAt: archived ? { not: null } : null,
   };
