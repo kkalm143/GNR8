@@ -1,0 +1,8 @@
+[Header]
+GSGT Version	2.0.4
+Processing Date	7/31/2025 12:56 PM
+Gender    Female
+Num SNPs	671521
+[Data]
+Sample ID	SNP Name	Chr	Position	Allele1 - Forward	Allele2 - Forward
+DSC042739	1:103380393	1	103380393	G	G

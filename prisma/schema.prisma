@@ -1,0 +1,260 @@
+// Genr8 Prisma schema – Phase 1: User and Client profile
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin
+  client
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  passwordHash        String               @map("password_hash")
+  name                String?
+  role                Role                 @default(client)
+  archivedAt          DateTime?            @map("archived_at")  // Phase 1: soft delete (clients only)
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  clientProfile       ClientProfile?
+  dnaResults          DNAResult[]
+  programAssignments  ProgramAssignment[]
+  progressEntries     ProgressEntry[]
+  clientGroups        UserClientGroup[]
+  messagesReceived    Message[]            @relation("MessageRecipient")
+  messagesSent        Message[]            @relation("MessageSender")
+  tasksAssignedTo     Task[]               @relation("TaskAssignedTo")
+  tasksAssignedBy     Task[]               @relation("TaskAssignedBy")
+}
+
+model ClientProfile {
+  id                     String         @id @default(cuid())
+  userId                 String         @unique @map("user_id")
+  user                   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateOfBirth            DateTime?      @map("date_of_birth")
+  phone                  String?
+  timezone               String?
+  consultationFileUrl    String?        @map("consultation_file_url")  // Phase 1: one file per client
+  onboardingCompletedAt DateTime?      @map("onboarding_completed_at")  // Client app Phase 2
+  createdAt              DateTime       @default(now()) @map("created_at")
+  updatedAt              DateTime       @updatedAt @map("updated_at")
+  clientSettings         ClientSettings?
+}
+
+// Phase 1: Per-client toggles (Everfit parity)
+model ClientSettings {
+  id                  String        @id @default(cuid())
+  clientProfileId     String        @unique @map("client_profile_id")
+  clientProfile       ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+  workoutComments     Boolean       @default(true) @map("workout_comments")
+  workoutVisibility   Boolean       @default(true) @map("workout_visibility")
+  allowRearrange     Boolean       @default(false) @map("allow_rearrange")
+  replaceExercise    Boolean       @default(false) @map("replace_exercise")
+  allowCreateWorkouts Boolean       @default(false) @map("allow_create_workouts")
+  pinnedMetrics      Json?         @map("pinned_metrics")  // e.g. ["body_metric:weight", "custom:..."]
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+}
+
+// Phase 1: Groups for segmenting clients (M:M with User)
+model ClientGroup {
+  id          String             @id @default(cuid())
+  name        String
+  description String?            @db.Text
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+  users       UserClientGroup[]
+}
+
+model UserClientGroup {
+  userId    String       @map("user_id")
+  groupId   String       @map("group_id")
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group     ClientGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now()) @map("created_at")
+  @@id([userId, groupId])
+  @@map("user_client_groups")
+}
+
+// Client app Phase 1: Inbox – coach→client announcements/messages
+model Message {
+  id         String    @id @default(cuid())
+  senderId   String    @map("sender_id")
+  recipientId String   @map("recipient_id")
+  subject    String?   @db.Text
+  body       String    @db.Text
+  readAt     DateTime? @map("read_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  sender     User      @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient  User      @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  @@map("messages")
+}
+
+// Client app Phase 3: Coach-assigned tasks
+model Task {
+  id               String    @id @default(cuid())
+  assignedToUserId String    @map("assigned_to_user_id")
+  assignedByUserId String    @map("assigned_by_user_id")
+  title            String    @db.Text
+  description      String?   @db.Text
+  dueDate          DateTime? @map("due_date")
+  completedAt      DateTime? @map("completed_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  assignedTo       User      @relation("TaskAssignedTo", fields: [assignedToUserId], references: [id], onDelete: Cascade)
+  assignedBy       User      @relation("TaskAssignedBy", fields: [assignedByUserId], references: [id], onDelete: Cascade)
+  @@map("tasks")
+}
+
+// Phase 2: Admin-configured interpretation fields (e.g. "Mobility Score", scale 1–10)
+model DNAInterpretationField {
+  id           String     @id @default(cuid())
+  name         String     // e.g. "Mobility Score"
+  type         String     // "scale" | "category"
+  min          Int?       // for scale (e.g. 1)
+  max          Int?       // for scale (e.g. 10)
+  options      Json?      // for category: ["Low", "Medium", "High"]
+  displayOrder Int       @default(0) @map("display_order")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+}
+
+// Phase 2: Per-client DNA result; field values stored as JSON (interpretationFieldId -> value)
+model DNAResult {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id") // client (User with role client)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rawFileUrl      String?  @map("raw_file_url")
+  fieldValues     Json?    @map("field_values") // { [fieldId]: value }
+  summary         String?  @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+}
+
+// Phase 3: Programs (admin-created) and assignments to clients
+model Program {
+  id              String           @id @default(cuid())
+  name            String
+  description     String?          @db.Text
+  content         String?          @db.Text // instructions / details
+  isActive        Boolean          @default(true) @map("is_active")
+  displayOrder    Int              @default(0) @map("display_order")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  assignments     ProgramAssignment[]
+  workoutSections WorkoutSection[]  // Phase 2 Everfit: structured workouts
+}
+
+// Phase 2 Everfit: Exercise library
+model Exercise {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?  @db.Text
+  demoVideoUrl String?  @map("demo_video_url")
+  source       String   @default("library") // "library" | "custom"
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  workoutSets  WorkoutSet[]
+}
+
+// Phase 2 Everfit: Section within a program (freestyle, AMRAP, timed, interval)
+model WorkoutSection {
+  id              String       @id @default(cuid())
+  programId       String       @map("program_id")
+  program         Program      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  type            String       @default("freestyle") // freestyle | amrap | timed | interval
+  name            String?
+  displayOrder    Int          @default(0) @map("display_order")
+  durationSeconds Int?        @map("duration_seconds") // for timed/interval
+  metadata        Json?        // round count, etc.
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  sets            WorkoutSet[]
+}
+
+// Phase 2 Everfit: One set = exercise + reps/weight/duration
+model WorkoutSet {
+  id              String    @id @default(cuid())
+  sectionId       String    @map("section_id")
+  section         WorkoutSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  exerciseId      String?   @map("exercise_id")
+  exercise        Exercise? @relation(fields: [exerciseId], references: [id], onDelete: SetNull)
+  displayOrder    Int       @default(0) @map("display_order")
+  reps            String?   // e.g. "10" or "AMRAP"
+  repRange        String?   @map("rep_range") // e.g. "8-12"
+  weight          String?
+  durationSeconds Int?     @map("duration_seconds")
+  notes           String?  @db.Text
+  setType         String   @default("normal") @map("set_type") // normal | warmup | drop | failure
+  customLabel     String?  @map("custom_label") // when no exerciseId, free text
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+}
+
+// Phase 2 Everfit: Reusable section templates
+model SectionTemplate {
+  id              String   @id @default(cuid())
+  name            String
+  type            String   @default("freestyle")
+  defaultDuration Int?     @map("default_duration") // seconds
+  defaultReps     String?  @map("default_reps")
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+}
+
+enum AssignmentStatus {
+  assigned
+  in_progress
+  completed
+}
+
+model ProgramAssignment {
+  id          String            @id @default(cuid())
+  userId      String            @map("user_id")
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programId   String            @map("program_id")
+  program     Program           @relation(fields: [programId], references: [id], onDelete: Cascade)
+  status      AssignmentStatus  @default(assigned)
+  startDate   DateTime?         @map("start_date")  // optional per plan
+  endDate     DateTime?         @map("end_date")    // optional per plan
+  assignedAt  DateTime          @default(now()) @map("assigned_at")
+  completedAt DateTime?         @map("completed_at")
+  notes       String?           @db.Text
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  progressEntries ProgressEntry[]
+
+  @@unique([userId, programId])
+  @@map("program_assignments")
+}
+
+// Phase 4: Client progress (type + value/notes + date per plan)
+enum ProgressEntryType {
+  note
+  workout_completed
+  body_metric
+  measurement
+  progress_photo
+}
+
+model ProgressEntry {
+  id                  String             @id @default(cuid())
+  userId              String             @map("user_id")
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  programAssignmentId String?            @map("program_assignment_id")
+  programAssignment   ProgramAssignment? @relation(fields: [programAssignmentId], references: [id], onDelete: SetNull)
+  type                ProgressEntryType   @default(note)
+  content             String             @db.Text   // notes / value text
+  value               Float?             // optional numeric (e.g. body weight)
+  loggedAt            DateTime?          @map("logged_at")  // optional date (default createdAt)
+  createdAt           DateTime           @default(now()) @map("created_at")
+
+  @@map("progress_entries")
+}

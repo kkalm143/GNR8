@@ -1,0 +1,1 @@
+{"location":"lib/db.ts:createPrisma","message":"DB connection string SSL param","data":{"sslmode":"verify-full"},"timestamp":1771912738643,"hypothesisId":"H1"}

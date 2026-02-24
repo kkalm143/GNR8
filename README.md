@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Genr8
 
-## Getting Started
+Science-based fitness and training, powered by your genetics.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Copy environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` and set:
+   - `DATABASE_URL` – your PostgreSQL connection string (e.g. from [Neon](https://neon.tech))
+   - `NEXTAUTH_SECRET` – run `openssl rand -base64 32` to generate
+   - `NEXTAUTH_URL` – `http://localhost:3000` for local dev
+   - `BLOB_READ_WRITE_TOKEN` – (optional) Vercel Blob token for admin DNA lab file uploads; if unset, uploads are disabled
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies** (if not already)
+   ```bash
+   npm install
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Create the database schema**
+   ```bash
+   npm run db:migrate
+   ```
+   (Or `npx prisma db push` for a quick sync without migration history.)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. **Create the first admin user**
+   ```bash
+   npm run db:seed
+   ```
+   Default: `admin@genr8.com` / `changeme123`. Override with `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD`.
 
-## Learn More
+5. **Run the app**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000). Log in as admin and go to `/admin`, or sign up as a client and use `/dashboard`.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` – start dev server
+- `npm run build` – build for production
+- `npm run start` – start production server
+- `npm run db:generate` – generate Prisma client
+- `npm run db:migrate` – run migrations
+- `npm run db:seed` – seed first admin user
+- `npm run db:push` – push schema to DB without migrations
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Branding (GNR8)
 
-## Deploy on Vercel
+The app uses a teal color palette inspired by [gnr8.org](https://www.gnr8.org/). Per the plan:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Logo**: Use the GNR8 logo from [gnr8.org](https://www.gnr8.org/) or from Nicole in the app header, login/landing, and favicon. The repo currently uses a generated "G" favicon (`app/icon.tsx`). To use the real logo: add the logo asset (e.g. `public/logo.svg` or from the site) and update the header/layout and replace `app/icon.tsx` or reference the logo in metadata.
+- **Colors**: Primary brand colors are in `app/globals.css` as CSS variables (`--brand`, `--brand-hover`). Adjust these to match extracted colors from gnr8.org if needed.
