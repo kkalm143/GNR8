@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
-/* GNR8 brand – inspired by gnr8.org, modern science/fitness */
+/*
+ * GNR8 brand – inspired by gnr8.org, modern science/fitness.
+ * Palette source: https://www.gnr8.org (visual audit for exact hex values).
+ * Primary: teal #0d9488; extend with gradient and section accents below.
+ */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -8,6 +12,32 @@
   --brand-hover: #0f766e;
   --brand-muted: #ccfbf1;
   --brand-foreground: #ffffff;
+
+  /* Optional second brand/accent from audit */
+  --accent: #0d9488;
+
+  /* Surfaces – warm, not pure white */
+  --surface: #f8faf8;
+  --surface-card: #ffffff;
+  --surface-elevated: #ffffff;
+
+  /* Borders */
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.12);
+
+  /* Gradients – teal/emerald family */
+  --gradient-page: linear-gradient(180deg, #fafbfa 0%, #f0f7f6 100%);
+  --gradient-hero: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #115e59 100%);
+  --gradient-cta: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  --gradient-card-accent: linear-gradient(180deg, var(--section-primary) 0%, transparent 100%);
+
+  /* Section accents (2–3 only): primary=teal, cool=soft blue, warm=amber */
+  --section-primary: #0d9488;
+  --section-cool: #0ea5e9;
+  --section-warm: #d97706;
+
+  /* Shadow */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
 }
 
 @theme inline {
@@ -17,6 +47,12 @@
   --color-brand-hover: var(--brand-hover);
   --color-brand-muted: var(--brand-muted);
   --color-brand-foreground: var(--brand-foreground);
+  --color-surface: var(--surface);
+  --color-surface-card: var(--surface-card);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-section-primary: var(--section-primary);
+  --color-section-cool: var(--section-cool);
+  --color-section-warm: var(--section-warm);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -26,6 +62,15 @@
     --background: #0a0a0a;
     --foreground: #ededed;
     --brand-muted: #134e4a;
+    --surface: #0f1419;
+    --surface-card: #171e26;
+    --surface-elevated: #1c252e;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.15);
+    --gradient-page: linear-gradient(180deg, #0c1014 0%, #0f1419 100%);
+    --gradient-hero: linear-gradient(135deg, #0f766e 0%, #115e59 50%, #134e4a 100%);
+    --gradient-cta: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.2), 0 1px 2px -1px rgb(0 0 0 / 0.2);
   }
 }
 

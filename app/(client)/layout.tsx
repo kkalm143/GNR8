@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import Image from "next/image";
 import { ClientNav } from "@/components/client-nav";
 import { OnboardingGate } from "@/components/onboarding-gate";
 import {
@@ -24,14 +25,14 @@ export default async function ClientLayout({
     role === "admin" && viewAs === "client";
   return (
     <OnboardingGate>
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-        <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="min-h-screen bg-surface" style={{ background: "var(--gradient-page)" }}>
+        <header className="border-b border-[var(--border-subtle)] bg-[var(--surface-elevated)] shadow-sm">
           <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
             <Link
               href="/today"
-              className="font-semibold text-zinc-900 dark:text-zinc-50 transition-colors hover:text-[var(--brand)]"
+              className="flex items-center gap-2 transition-opacity hover:opacity-80"
             >
-              GNR8
+              <Image src="/logo.svg" alt="GNR8" width={96} height={28} className="h-7 w-auto" />
             </Link>
             <ClientNav isAdminViewingAsClient={isAdminViewingAsClient} />
           </div>

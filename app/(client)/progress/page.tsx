@@ -29,7 +29,7 @@ export default async function ProgressPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        My progress
+        <span className="border-b-2 border-[var(--section-cool)] pb-0.5">My progress</span>
       </h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">
         Log notes and track how you&apos;re doing. Optionally link an entry to a program.
@@ -54,7 +54,10 @@ export default async function ProgressPage() {
           Recent entries
         </h2>
         {entries.length === 0 ? (
-          <p className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 py-8 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-400">
+          <p
+            className="mt-4 rounded-xl border-l-4 border-[var(--section-cool)] bg-[var(--surface-card)] py-8 text-center text-sm text-zinc-600 dark:text-zinc-400"
+            style={{ boxShadow: "var(--shadow-card)" }}
+          >
             No progress entries yet. Add one above.
           </p>
         ) : (
@@ -62,7 +65,8 @@ export default async function ProgressPage() {
             {entries.map((e) => (
               <li
                 key={e.id}
-                className="rounded-lg border border-zinc-200 px-4 py-3 dark:border-zinc-800"
+                className="rounded-xl border-l-4 border-[var(--section-cool)] bg-[var(--surface-card)] px-4 py-3 shadow-sm dark:bg-[var(--surface-card)]"
+                style={{ boxShadow: "var(--shadow-card)" }}
               >
                 <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                   {e.type.replace("_", " ")}

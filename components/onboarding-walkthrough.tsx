@@ -26,15 +26,18 @@ export function OnboardingWalkthrough({ onComplete, onSkip }: OnboardingWalkthro
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/80 p-4">
-      <div className="w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-900 p-6 shadow-xl">
-        <h2 className="text-xl font-bold text-zinc-50">{current.title}</h2>
-        <p className="mt-3 text-zinc-300">{current.body}</p>
+      <div
+        className="w-full max-w-md rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] p-6 dark:border-zinc-700 dark:bg-zinc-900"
+        style={{ boxShadow: "var(--shadow-card)" }}
+      >
+        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">{current.title}</h2>
+        <p className="mt-3 text-zinc-600 dark:text-zinc-300">{current.body}</p>
         <div className="mt-6 flex items-center justify-between gap-3">
           <div className="flex gap-1">
             {STEPS.map((_, i) => (
               <span
                 key={i}
-                className={`h-2 w-2 rounded-full ${i === step ? "bg-[var(--brand)]" : "bg-zinc-600"}`}
+                className={`h-2 w-2 rounded-full ${i === step ? "bg-[var(--brand)]" : "bg-zinc-400 dark:bg-zinc-600"}`}
                 aria-hidden
               />
             ))}
@@ -44,7 +47,7 @@ export function OnboardingWalkthrough({ onComplete, onSkip }: OnboardingWalkthro
               <button
                 type="button"
                 onClick={onSkip}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 hover:text-zinc-50"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
               >
                 Skip
               </button>
@@ -52,7 +55,8 @@ export function OnboardingWalkthrough({ onComplete, onSkip }: OnboardingWalkthro
             <button
               type="button"
               onClick={handleNext}
-              className="rounded-lg bg-[var(--brand)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+              className="rounded-xl px-4 py-2 text-sm font-medium text-white transition-all hover:brightness-110"
+              style={{ background: "var(--gradient-cta)" }}
             >
               {isLast ? "Get started" : "Next"}
             </button>

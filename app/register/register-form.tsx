@@ -38,7 +38,7 @@ export function RegisterForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="flex w-full max-w-sm flex-col gap-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+      className="mt-4 flex w-full max-w-sm flex-col gap-4"
     >
       {error && (
         <p className="rounded bg-red-100 px-3 py-2 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-200">
@@ -102,7 +102,8 @@ export function RegisterForm() {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-md bg-[var(--brand)] px-4 py-2 font-medium text-white transition-colors hover:bg-[var(--brand-hover)] disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
+        className="rounded-xl px-4 py-2 font-medium text-white transition-all hover:brightness-110 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
+        style={{ background: "var(--gradient-cta)" }}
       >
         {loading ? "Creating account…" : "Sign up"}
       </button>

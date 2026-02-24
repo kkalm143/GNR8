@@ -41,13 +41,16 @@ export default async function TodayPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        Today
+        <span className="border-b-2 border-[var(--section-primary)] pb-0.5">Today</span>
       </h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">
         Welcome back, {name}. Here&apos;s your focus for today.
       </p>
 
-      <section className="mt-6 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <section
+        className="mt-6 rounded-xl border-l-4 border-[var(--section-primary)] bg-[var(--surface-card)] p-4 shadow-sm dark:bg-[var(--surface-card)]"
+        style={{ boxShadow: "var(--shadow-card)" }}
+      >
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           What&apos;s on today
         </h2>

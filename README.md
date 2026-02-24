@@ -51,7 +51,11 @@ Science-based fitness and training, powered by your genetics.
 
 ## Branding (GNR8)
 
-The app uses a teal color palette inspired by [gnr8.org](https://www.gnr8.org/). Per the plan:
+The app uses a teal color palette sourced from [gnr8.org](https://www.gnr8.org/). Palette and tokens are in `app/globals.css`:
 
-- **Logo**: Use the GNR8 logo from [gnr8.org](https://www.gnr8.org/) or from Nicole in the app header, login/landing, and favicon. The repo currently uses a generated "G" favicon (`app/icon.tsx`). To use the real logo: add the logo asset (e.g. `public/logo.svg` or from the site) and update the header/layout and replace `app/icon.tsx` or reference the logo in metadata.
-- **Colors**: Primary brand colors are in `app/globals.css` as CSS variables (`--brand`, `--brand-hover`). Adjust these to match extracted colors from gnr8.org if needed.
+- **Brand**: `--brand` (#0d9488), `--brand-hover` (#0f766e), `--brand-muted`, `--brand-foreground`
+- **Surfaces**: `--surface`, `--surface-card`, `--surface-elevated` (warm, not pure white)
+- **Gradients**: `--gradient-page`, `--gradient-hero`, `--gradient-cta`
+- **Section accents**: `--section-primary` (teal), `--section-cool` (soft blue), `--section-warm` (amber) for nav and card accents
+
+**Logo**: A placeholder logo is at `public/logo.svg`. Replace with the official GNR8 logo from [gnr8.org](https://www.gnr8.org/) or from Nicole; the header and landing page reference `/logo.svg`. Favicon: `app/icon.tsx` (brand-colored "G"); update to use the real logo if desired.

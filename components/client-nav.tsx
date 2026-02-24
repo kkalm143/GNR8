@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { getSectionToken } from "@/lib/section-token";
 
 const navItems = [
   { href: "/today", label: "Today" },
@@ -30,22 +31,36 @@ export function ClientNav({
           Back to admin
         </Link>
       )}
-      {navItems.map(({ href, label }) => (
-        <Link
-          key={href}
-          href={href}
-          className={`text-sm font-medium transition-colors ${
-            pathname === href || (href !== "/today" && pathname?.startsWith(href))
-              ? "text-zinc-900 dark:text-zinc-50"
-              : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-          }`}
-        >
-          {label}
-        </Link>
-      ))}
+      {navItems.map(({ href, label }) => {
+        const isActive =
+          pathname === href || (href !== "/today" && pathname?.startsWith(href));
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={`text-sm font-medium transition-colors ${
+              isActive
+                ? "text-[var(--section-primary)] dark:text-[var(--section-primary)]"
+                : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+            }`}
+            style={isActive ? { color: `var(${getSectionToken(href)})` } : undefined}
+          >
+            {label}
+          </Link>
+        );
+      })}
       <Link
         href="/results"
-        className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+        className={`text-sm font-medium transition-colors ${
+          pathname?.startsWith("/results")
+            ? "text-[var(--section-cool)]"
+            : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+        }`}
+        style={
+          pathname?.startsWith("/results")
+            ? { color: "var(--section-cool)" }
+            : undefined
+        }
       >
         Results
       </Link>

@@ -29,13 +29,16 @@ export default async function TasksPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        Tasks
+        <span className="border-b-2 border-[var(--section-warm)] pb-0.5">Tasks</span>
       </h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">
         Tasks assigned by your coach. Mark them complete when done.
       </p>
       {tasks.length === 0 ? (
-        <p className="mt-8 rounded-lg border border-zinc-200 bg-zinc-50 py-8 text-center text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-400">
+        <p
+          className="mt-8 rounded-xl border-l-4 border-[var(--section-warm)] bg-[var(--surface-card)] py-8 text-center text-sm text-zinc-600 dark:text-zinc-400"
+          style={{ boxShadow: "var(--shadow-card)" }}
+        >
           No tasks assigned yet.
         </p>
       ) : (
