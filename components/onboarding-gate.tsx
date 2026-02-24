@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { OnboardingWalkthrough } from "./onboarding-walkthrough";
 
-export const SHOW_ONBOARDING_EVENT = "genr8-show-onboarding";
+export const SHOW_ONBOARDING_EVENT = "gnr8-show-onboarding";
 
 type Me = {
   role: string;

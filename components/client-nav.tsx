@@ -14,10 +14,22 @@ const navItems = [
   { href: "/account", label: "You" },
 ] as const;
 
-export function ClientNav() {
+export function ClientNav({
+  isAdminViewingAsClient = false,
+}: {
+  isAdminViewingAsClient?: boolean;
+}) {
   const pathname = usePathname();
   return (
     <nav className="flex flex-wrap items-center gap-3">
+      {isAdminViewingAsClient && (
+        <Link
+          href="/api/auth/view-as-clear"
+          className="text-sm font-medium text-[var(--brand)] hover:underline"
+        >
+          Back to admin
+        </Link>
+      )}
       {navItems.map(({ href, label }) => (
         <Link
           key={href}

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { EditAccountForm } from "@/app/(client)/account/edit-account-form";
+import { ChangePasswordForm } from "@/components/change-password-form";
 
 export default async function AdminAccountPage() {
   const session = await auth();
@@ -42,6 +43,9 @@ export default async function AdminAccountPage() {
         backHref="/admin"
         backLabel="Back to dashboard"
       />
+      <div className="mt-10 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+        <ChangePasswordForm className="max-w-md" />
+      </div>
     </div>
   );
 }

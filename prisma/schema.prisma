@@ -1,4 +1,4 @@
-// Genr8 Prisma schema – Phase 1: User and Client profile
+// GNR8 Prisma schema – Phase 1: User and Client profile
 // https://pris.ly/d/prisma-schema
 
 generator client {

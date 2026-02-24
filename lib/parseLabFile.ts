@@ -1,5 +1,5 @@
 /**
- * Parser for Genr8 lab DNA result files (GSGT format).
+ * Parser for GNR8 lab DNA result files (GSGT format).
  * Sample: DSC042739_NicoleTorosin.txt
  * Format: [Header] block (key\tvalue), then [Data] block (tab-delimited table).
  * We only parse metadata (header + data column names); raw SNP data is not mapped to interpretation fields.

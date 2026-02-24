@@ -1,15 +1,15 @@
-# Genr8 Implementation Status
+# GNR8 Implementation Status
 
 **Purpose:** Map what has actually been built in the codebase to the plan documents, so it’s clear what’s done vs not as of 02-23-2026 @ 11:40pm PST
 
 **Plans referenced:**
-- **Main plan:** [.cursor/plans/genr8_fitness_app_7f31eaa2.plan.md](../.cursor/plans/genr8_fitness_app_7f31eaa2.plan.md) (Genr8 Fitness App – includes “Setup and operations” section)
+- **Main plan:** [.cursor/plans/genr8_fitness_app_7f31eaa2.plan.md](../.cursor/plans/genr8_fitness_app_7f31eaa2.plan.md) (GNR8 Fitness App – includes “Setup and operations” section)
 - **Everfit parity:** [docs/EVERFIT_PARITY_IMPLEMENTATION_PLAN.md](EVERFIT_PARITY_IMPLEMENTATION_PLAN.md)
 - **Other plans:** Various `.cursor/plans/*.plan.md` (add_setup_guide, lab_text_file_dna_ingestion, client_app_everfit_parity, etc.) – status summarized below where relevant.
 
 ---
 
-## 1. Main plan (Genr8 Fitness App) – implementation status
+## 1. Main plan (GNR8 Fitness App) – implementation status
 
 ### Setup and operations (from “Add setup guide” plan – now in main plan)
 
@@ -107,17 +107,17 @@ See EVERFIT_PARITY_IMPLEMENTATION_PLAN.md for the full gap table and phased chec
 
 | Plan | What it is | Implemented? |
 |------|------------|---------------|
-| **add_setup_guide_to_plan_911f0b06** | Add “Setup and operations” section to main plan | ✅ **Plan doc only:** Section was added to genr8_fitness_app_7f31eaa2.plan.md. The steps described there (DB, auth, seed, route protection) were already implemented in code; the guide now documents them. |
+| **add_setup_guide_to_plan_911f0b06** | Add “Setup and operations” section to main plan | ✅ **Plan doc only:** Section was added to gnr8_fitness_app_7f31eaa2.plan.md. The steps described there (DB, auth, seed, route protection) were already implemented in code; the guide now documents them. |
 | **lab_text_file_dna_ingestion** | Lab file upload + parse + map to interpretation fields | ✅ Parser (`lib/parseLabFile.ts`), parse-dna-file API, and admin “add DNA result” flow with upload and manual entry. |
 | **client_app_everfit_parity** | Client app UX aligned with Everfit/Trainerize | ⚠️ Partially: client programs, results, progress, today, inbox, tasks exist; see Everfit parity doc for remaining gaps. |
-| **genr8_codebase_review_and_cleanup** | Review and cleanup tasks | Not mapped here; would require reading that plan and checking each item. |
+| **gnr8_codebase_review_and_cleanup** | Review and cleanup tasks | Not mapped here; would require reading that plan and checking each item. |
 | **scalable_feature_flags**, **hide_groups_from_nav**, **mvp_epics_and_stories**, **jtbd_meeting_tie-in**, **hippocampus_***, **deliverable_1_***, etc. | Various product/process plans | Not audited in this doc; names suggest strategy/mvp/other projects. |
 
 ---
 
 ## 4. How to use this doc
 
-- **“What’s actually built?”** → Use Section 1 (main plan) and Section 2 (Everfit parity). Section 1 is the source of truth for “Genr8 Fitness App” scope; Section 2 refines with Everfit-style features.
+- **“What’s actually built?”** → Use Section 1 (main plan) and Section 2 (Everfit parity). Section 1 is the source of truth for “GNR8 Fitness App” scope; Section 2 refines with Everfit-style features.
 - **“Was the setup guide implemented?”** → The setup guide is **in the main plan** (Section “Setup and operations”); the **steps** (DB, auth, seed, protection) are **implemented in code**; the guide did not add new code, it added documentation to the plan.
 - **“What’s next?”** → Use the main plan Phases 4–5 “partial” items and EVERFIT_PARITY_IMPLEMENTATION_PLAN.md Phase 3+ for remaining work.
 

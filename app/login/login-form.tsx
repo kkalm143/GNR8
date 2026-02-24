@@ -7,7 +7,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl");
+  const mode = searchParams.get("mode") ?? undefined;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -34,7 +35,18 @@ export function LoginForm() {
         setLoading(false);
         return;
       }
-      router.push(callbackUrl);
+      const targetUrl =
+        callbackUrl && callbackUrl.startsWith("/")
+          ? callbackUrl
+          : mode === "admin"
+            ? "/admin"
+            : mode === "client"
+              ? "/dashboard"
+              : "/dashboard";
+      if (mode === "client") {
+        await fetch("/api/auth/view-as-client", { credentials: "include" });
+      }
+      router.push(targetUrl);
       router.refresh();
     } catch (err) {
       if (debug && typeof window !== "undefined") {

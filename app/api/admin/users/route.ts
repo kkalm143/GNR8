@@ -8,30 +8,33 @@ export async function GET(request: Request) {
   const session = await requireAdmin();
   if (session instanceof NextResponse) return session;
   const { searchParams } = new URL(request.url);
-  const archived = searchParams.get("archived");
+  const roleParam = searchParams.get("role");
   const search = searchParams.get("search")?.trim();
-  const groupId = searchParams.get("groupId")?.trim() || undefined;
 
-  const where: Prisma.UserWhereInput = {
-    role: Role.client,
-    archivedAt: archived === "true" ? { not: null } : null,
-  };
+  const where: Prisma.UserWhereInput = {};
+  if (roleParam === "admin" || roleParam === "client") {
+    where.role = roleParam as Role;
+  }
   if (search) {
     where.OR = [
       { name: { contains: search, mode: "insensitive" as const } },
       { email: { contains: search, mode: "insensitive" as const } },
     ];
   }
-  if (groupId) {
-    where.clientGroups = { some: { groupId } };
-  }
 
-  const clients = await prisma.user.findMany({
+  const users = await prisma.user.findMany({
     where,
-    include: { clientProfile: true },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      createdAt: true,
+      archivedAt: true,
+    },
     orderBy: { createdAt: "desc" },
   });
-  return NextResponse.json(clients);
+  return NextResponse.json(users);
 }
 
 export async function POST(request: Request) {
@@ -39,26 +42,34 @@ export async function POST(request: Request) {
   if (session instanceof NextResponse) return session;
   try {
     const body = await request.json();
-    const { email, name, password, phone, dateOfBirth, timezone } = body;
+    const email = body.email;
+    const name = body.name;
+    const password = body.password;
+    const role = body.role;
+
     if (!email || typeof email !== "string") {
       return apiError("Email is required.", 400);
     }
+    if (role !== "admin" && role !== "client") {
+      return apiError("Role must be admin or client.", 400);
+    }
+
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return apiError("A user with this email already exists.", 409);
     }
+
     const user = await createUserWithRole(prisma, {
       email,
       name: typeof name === "string" ? name : null,
       password: typeof password === "string" && password.length >= 8 ? password : undefined,
-      role: Role.client,
-      phone: typeof phone === "string" ? phone : null,
-      timezone: typeof timezone === "string" ? timezone : null,
-      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
+      role: role as Role,
+      phone: typeof body.phone === "string" ? body.phone : null,
+      timezone: typeof body.timezone === "string" ? body.timezone : null,
+      dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
     });
     return NextResponse.json(user);
   } catch (e) {
-    console.error("Create client error:", e);
-    return apiError("Failed to create client.", 500, e);
+    return apiError("Failed to create user.", 500, e);
   }
 }

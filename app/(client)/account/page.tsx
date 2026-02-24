@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { EditAccountForm } from "./edit-account-form";
 import { ShowOnboardingAgainButton } from "./show-onboarding-again-button";
+import { ChangePasswordForm } from "@/components/change-password-form";
 
 export default async function AccountPage() {
   const session = await auth();
@@ -39,6 +40,9 @@ export default async function AccountPage() {
             : "",
         }}
       />
+      <div className="mt-10 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+        <ChangePasswordForm className="max-w-md" />
+      </div>
     </div>
   );
 }

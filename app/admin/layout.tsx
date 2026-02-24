@@ -20,7 +20,7 @@ export default async function AdminLayout({
             href="/admin"
             className="font-semibold text-zinc-900 dark:text-zinc-50 transition-colors hover:text-[var(--brand)]"
           >
-            Genr8 Admin
+            GNR8 Admin
           </Link>
           <AdminNav />
         </div>

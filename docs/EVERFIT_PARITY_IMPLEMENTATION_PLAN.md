@@ -1,6 +1,6 @@
-# Genr8 → Everfit Parity: Implementation Plan
+# GNR8 → Everfit Parity: Implementation Plan
 
-**Purpose:** Bring Genr8’s program builder and client manager to feature parity with [Everfit’s Workout Builder](https://help.everfit.io/en/collections/1789451-everfit-s-workout-builder) and [Manage Clients](https://help.everfit.io/en/collections/1649397-manage-clients) capabilities, based on their public help documentation.
+**Purpose:** Bring GNR8’s program builder and client manager to feature parity with [Everfit’s Workout Builder](https://help.everfit.io/en/collections/1789451-everfit-s-workout-builder) and [Manage Clients](https://help.everfit.io/en/collections/1649397-manage-clients) capabilities, based on their public help documentation.
 
 **Last updated:** 2025-02 (from Everfit help center as of this date)
 
@@ -88,7 +88,7 @@
 
 ---
 
-## 2. Genr8 current state
+## 2. GNR8 current state
 
 ### 2.1 Data model (from `prisma/schema.prisma`)
 
@@ -96,7 +96,7 @@
 - **Program:** name, description, content (text), isActive, displayOrder. No workout structure (no sections, sets, exercises).  
 - **ProgramAssignment:** user, program, status (assigned | in_progress | completed), startDate, endDate, notes.  
 - **ProgressEntry:** user, optional programAssignment, type (note | workout_completed | body_metric | measurement | progress_photo), content, value, loggedAt.  
-- **DNA:** DNAResult, DNAInterpretationField (Genr8-specific; no Everfit direct equivalent).
+- **DNA:** DNAResult, DNAInterpretationField (GNR8-specific; no Everfit direct equivalent).
 
 ### 2.2 Client manager (admin)
 
@@ -120,7 +120,7 @@
 
 ## 3. Gap summary
 
-| Area | Genr8 has | Missing for parity (high level) |
+| Area | GNR8 has | Missing for parity (high level) |
 |------|-----------|----------------------------------|
 | **Client list** | List, add one, edit, view | Archive/reactivate, CSV import, bulk add, global search, segments, groups |
 | **Client settings** | — | Per-client toggles (comments, visibility, rearrange, replace exercise, create workouts), consultation file, pinned metrics, exercise history view |
@@ -347,4 +347,4 @@ Recommendation: **Do Phase 1 first** (client manager parity and multi-assign). T
 
 ---
 
-*This plan is a living document. Adjust scope and phasing to match Genr8’s roadmap and capacity (e.g. genetics-first features vs general fitness tooling).*
+*This plan is a living document. Adjust scope and phasing to match GNR8’s roadmap and capacity (e.g. genetics-first features vs general fitness tooling).*

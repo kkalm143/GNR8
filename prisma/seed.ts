@@ -9,7 +9,7 @@ const adapter = new PrismaPg({ connectionString: url });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@genr8.com";
+  const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "admin@gnr8.com";
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? "changeme123";
   let existing = await prisma.user.findUnique({ where: { email: adminEmail } });
   if (!existing) {
@@ -27,7 +27,7 @@ async function main() {
     console.log("Admin user already exists:", adminEmail);
   }
 
-  const clientEmail = process.env.SEED_CLIENT_EMAIL ?? "nicole@genr8.com";
+  const clientEmail = process.env.SEED_CLIENT_EMAIL ?? "nicole@gnr8.com";
   const clientPassword = process.env.SEED_CLIENT_PASSWORD ?? "nicole123";
   existing = await prisma.user.findUnique({ where: { email: clientEmail } });
   if (!existing) {

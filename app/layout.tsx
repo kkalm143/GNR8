@@ -14,11 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Genr8 | Your genetics. Your coach. Your breakthrough.",
+  title: "GNR8 | Your genetics. Your coach. Your breakthrough.",
   description:
     "Hyper-personalized fitness powered by your genetics. DNA-based training, real coaching, research-validated methods. San Diego.",
   openGraph: {
-    title: "Genr8 | Your genetics. Your coach. Your breakthrough.",
+    title: "GNR8 | Your genetics. Your coach. Your breakthrough.",
     description:
       "Hyper-personalized fitness powered by your genetics. DNA-based training, real coaching, research-validated methods.",
   },

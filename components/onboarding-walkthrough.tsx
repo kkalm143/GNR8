@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const STEPS = [
-  { title: "Welcome", body: "Welcome to Genr8. Your coach uses this app to assign programs and stay in touch." },
+  { title: "Welcome", body: "Welcome to GNR8. Your coach uses this app to assign programs and stay in touch." },
   { title: "Today is your hub", body: "The Today screen shows what's on your schedule and quick links to programs and progress." },
   { title: "Programs are here", body: "Open Programs to see assigned workouts and content from your coach." },
   { title: "Log progress here", body: "Use Progress to log notes, workouts, body metrics, and photos." },

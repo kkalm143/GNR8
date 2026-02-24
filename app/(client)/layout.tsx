@@ -1,8 +1,13 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { ClientNav } from "@/components/client-nav";
 import { OnboardingGate } from "@/components/onboarding-gate";
+import {
+  getViewAsFromCookies,
+  shouldRedirectAdminAwayFromClientApp,
+} from "@/lib/view-as-client";
 
 export default async function ClientLayout({
   children,
@@ -12,7 +17,11 @@ export default async function ClientLayout({
   const session = await auth();
   if (!session?.user) redirect("/login");
   const role = (session.user as { role?: string }).role;
-  if (role === "admin") redirect("/admin");
+  const cookieStore = await cookies();
+  const viewAs = getViewAsFromCookies(cookieStore);
+  if (shouldRedirectAdminAwayFromClientApp(role, viewAs)) redirect("/admin");
+  const isAdminViewingAsClient =
+    role === "admin" && viewAs === "client";
   return (
     <OnboardingGate>
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -22,9 +31,9 @@ export default async function ClientLayout({
               href="/today"
               className="font-semibold text-zinc-900 dark:text-zinc-50 transition-colors hover:text-[var(--brand)]"
             >
-              Genr8
+              GNR8
             </Link>
-            <ClientNav />
+            <ClientNav isAdminViewingAsClient={isAdminViewingAsClient} />
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>

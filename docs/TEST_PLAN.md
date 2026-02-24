@@ -1,4 +1,4 @@
-# Genr8 Test Plan
+# GNR8 Test Plan
 
 Test-driven approach: **unit tests everywhere**, **integration tests where necessary**. This document identifies gaps and a phased plan for adding tests and any refactors.
 

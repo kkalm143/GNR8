@@ -1,4 +1,4 @@
-# Genr8
+# GNR8
 
 Science-based fitness and training, powered by your genetics.
 
@@ -29,7 +29,7 @@ Science-based fitness and training, powered by your genetics.
    ```bash
    npm run db:seed
    ```
-   Default: `admin@genr8.com` / `changeme123`. Override with `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD`.
+   Default: `admin@gnr8.com` / `changeme123`. Override with `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD`.
 
 5. **Run the app**
    ```bash

@@ -14,6 +14,12 @@ export function AdminNav() {
         Dashboard
       </Link>
       <Link
+        href="/admin/users"
+        className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+      >
+        Users
+      </Link>
+      <Link
         href="/admin/clients"
         className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
       >
@@ -46,7 +52,7 @@ export function AdminNav() {
         Account
       </Link>
       <Link
-        href="/dashboard"
+        href="/api/auth/view-as-client"
         className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
       >
         Client app

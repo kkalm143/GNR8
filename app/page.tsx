@@ -1,12 +1,17 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { BrandFooter } from "@/components/brand-footer";
+import { getViewAsFromCookies } from "@/lib/view-as-client";
 
 export default async function HomePage() {
   const session = await auth();
   if (session?.user) {
     const role = (session.user as { role?: string }).role;
+    const cookieStore = await cookies();
+    const viewAs = getViewAsFromCookies(cookieStore);
+    if (viewAs === "client") redirect("/dashboard");
     if (role === "admin") redirect("/admin");
     redirect("/dashboard");
   }
@@ -15,7 +20,7 @@ export default async function HomePage() {
       <main className="flex flex-1 flex-col items-center justify-center gap-10 px-6 py-16">
         <div className="flex flex-col items-center gap-4 text-center">
           <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-            Genr8
+            GNR8
           </h1>
           <p className="max-w-lg text-xl text-[var(--brand)] font-semibold">
             Your genetics. Your coach. Your breakthrough.
